@@ -1,35 +1,78 @@
-import './App.css'
-import Card from './components/Card.jsx'
-import Cards from './components/Cards.jsx'
-import SearchBar from './components/SearchBar.jsx'
-import characters, { Rick } from './data.js'
+import { useState, useEffect } from "react";
+import "./App.css";
+import Cards from "./components/Cards/Cards.jsx";
+import NavBar from "./components/NavBar/Navbar";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import About from "./components/About/About";
+import Detail from "./components/Detail/Detail";
+import Form from "./components/Form/Form";
+import {Favorites} from "./components/Favorites/Favorites";
 
-function App () {
+function App() {
+  const [characters, setCharacters] = useState([]);
+  const location = useLocation();
+  console.log(location);
+
+  /* const example = {
+    name: 'Morty Smith',
+    species: 'Human',
+    gender: 'Male',
+    image: 'https://rickandmortyapi.com/api/character/avatar/2.jpeg',
+ };
+
+
+  const onSearch = (data) => { 
+    setCharacters([...characters, example])
+  } */
+
+  const [access, setAccess] = useState(false);
+  const username = "cesarsell@hotmail.com";
+  const password = "123456";
+  const navigate = useNavigate();
+  
+  function login(userData) {
+    if (userData.password === password && userData.username === username) {
+      setAccess(true);
+      navigate("/home");
+    }
+  }
+
+  useEffect(() => {
+    !access && navigate("/");
+  }, [access]);
+
+  function onSearch(character) {
+    fetch(`https://rickandmortyapi.com/api/character/${character}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.name) {
+          setCharacters((oldChars) => [...oldChars, data]);
+        } else {
+          window.alert("No hay personajes con ese ID");
+        }
+      });
+  }
+
+  const onClose = (id) => {
+    setCharacters(characters.filter((charact) => id !== charact.id));
+  };
+
   return (
-    <div className='App' style={{ padding: '25px' }}>
-      <div>
-        <Card
-          name={Rick.name}
-          species={Rick.species}
-          gender={Rick.gender}
-          image={Rick.image}
-          onClose={() => window.alert('Emulamos que se cierra la card')}
-        />
-      </div>
+    <div className="App" style={{ padding: "25px" }}>
+      {location.pathname === "/" ? <Form login = {login}/> : <NavBar onSearch={onSearch} />}
       <hr />
-      <div>
-        <Cards
-          characters={characters}
+      <Routes>
+        <Route path="/about" element={<About />} />
+        <Route
+          path="/home"
+          element={<Cards characters={characters} onClose={onClose} />}
         />
-      </div>
-      <hr />
-      <div>
-        <SearchBar
-          onSearch={(characterID) => window.alert(characterID)}
-        />
-      </div>
+        <Route path="/about" element={<About />} />
+        <Route path="/detail/:detailId" element={<Detail />} />
+        <Route path="/favorites" element={<Favorites />} />
+      </Routes>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

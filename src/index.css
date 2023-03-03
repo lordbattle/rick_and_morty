@@ -5,6 +5,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  background-image: url('https://i0.wp.com/www.vozactual.com/wp-content/uploads/2020/02/Rickandmortytitle.png?resize=1280%2C640&ssl=1');
+  background-size: cover;
 }
 
 code {
